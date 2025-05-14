@@ -60,12 +60,7 @@ class aigencoursexblock(XBlock, StudioEditableXBlockMixin, CompletableXBlockMixi
     context = String(
         display_name=_('Context'),
         default="""
-        Evaluate my response to the question below:
-        Question: {{question}}
-        My Answer: {{answer}}
-        Provide detailed feedback that includes:
-        - An assessment of correctness.
-        - Clear guidance on how to improve the answer, if needed.
+        Provide a context like - generate questions and answers
         """,
         scope=Scope.settings,
         multiline_editor=True,
@@ -181,14 +176,19 @@ class aigencoursexblock(XBlock, StudioEditableXBlockMixin, CompletableXBlockMixi
         return frag
 
     def get_chat_completion(
-            self, prompt='', model='gpt-3.5-turbo', temperature=0.5, max_tokens=150, n=1
+            self, prompt='', model='gpt-4o-mini', temperature=0.5, max_tokens=150, n=1
     ):
         """ Returns the improvement for student answer using ChatGPT Model """
         client = self.get_openai_client()
         if client is None:
             return {'error': _('Unable to initialize OpenAI client. Please check configuration.')}
 
-        messages = [{"role": "user", "content": prompt}]
+         messages=[
+            {"role": "system", "content": f"""You are an educational instructor.Provide answer based on what is asked.
+            """
+            },
+            {"role": "user", "content": prompt}]
+
         try:
             response = client.chat.completions.create(messages=messages,
                                                       model=model,
