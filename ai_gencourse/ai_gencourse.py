@@ -175,19 +175,16 @@ class aigencoursexblock(XBlock, StudioEditableXBlockMixin, CompletableXBlockMixi
         frag.initialize_js('aigencoursexblock', json_args=self.get_context())
         return frag
 
-    def get_chat_completion(
-            self, prompt='', model='gpt-4o-mini', temperature=0.5, max_tokens=150, n=1
-    ):
+    def get_chat_completion(self, prompt='', model='gpt-4o-mini', temperature=0.5, max_tokens=150, n=1):
         """ Returns the improvement for student answer using ChatGPT Model """
         client = self.get_openai_client()
+        messages = [
+            {"role": "system", "content": f"""You are an educational instructor.Provide answer based on what is asked."""},
+            {"role": "user", "content": prompt}
+            ]
         if client is None:
             return {'error': _('Unable to initialize OpenAI client. Please check configuration.')}
 
-         messages=[
-            {"role": "system", "content": f"""You are an educational instructor.Provide answer based on what is asked.
-            """
-            },
-            {"role": "user", "content": prompt}]
 
         try:
             response = client.chat.completions.create(messages=messages,
